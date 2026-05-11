@@ -1,0 +1,217 @@
+:root {
+  font-family: 'IBM Plex Sans', 'Segoe UI', sans-serif;
+  color: #1d2433;
+  background: linear-gradient(180deg, #f7f4ea 0%, #e3edf4 100%);
+  line-height: 1.5;
+  font-weight: 400;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+}
+
+button,
+textarea {
+  font: inherit;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+.app-shell {
+  display: grid;
+  grid-template-columns: 300px 1fr;
+  min-height: 100vh;
+}
+
+.history-panel {
+  background: rgba(255, 252, 246, 0.94);
+  border-right: 1px solid rgba(29, 36, 51, 0.12);
+  padding: 1.5rem 1rem;
+  backdrop-filter: blur(10px);
+}
+
+.history-toggle {
+  width: 100%;
+  border: 0;
+  background: #1d2433;
+  color: #fff;
+  padding: 0.85rem 1rem;
+  text-align: left;
+  border-radius: 14px;
+  cursor: pointer;
+}
+
+.history-list {
+  margin-top: 1rem;
+}
+
+.history-item {
+  width: 100%;
+  display: block;
+  margin-bottom: 0.75rem;
+  padding: 0.9rem;
+  border: 1px solid rgba(29, 36, 51, 0.12);
+  border-radius: 14px;
+  background: #fff;
+  text-align: left;
+  cursor: pointer;
+}
+
+.history-prompt,
+.history-date {
+  display: block;
+}
+
+.history-date {
+  margin-top: 0.35rem;
+  font-size: 0.85rem;
+  color: #5d6a7e;
+}
+
+.history-empty {
+  color: #5d6a7e;
+}
+
+.main-panel {
+  padding: 2rem;
+}
+
+.page-header {
+  max-width: 760px;
+}
+
+.eyebrow {
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  font-size: 0.75rem;
+  color: #8e4b2f;
+}
+
+.page-header h1 {
+  margin: 0.4rem 0;
+  font-size: clamp(2.1rem, 4vw, 4rem);
+}
+
+.subtitle {
+  margin-top: 0;
+  max-width: 60ch;
+  color: #4f5b70;
+}
+
+.prompt-input {
+  margin-top: 1.5rem;
+}
+
+.prompt-input textarea {
+  width: 100%;
+  min-height: 150px;
+  padding: 1rem;
+  border-radius: 18px;
+  border: 1px solid rgba(29, 36, 51, 0.15);
+  background: rgba(255, 255, 255, 0.9);
+  resize: vertical;
+}
+
+.prompt-input button {
+  margin-top: 0.9rem;
+  border: 0;
+  border-radius: 999px;
+  background: #8e4b2f;
+  color: #fff;
+  padding: 0.85rem 1.3rem;
+  cursor: pointer;
+}
+
+.prompt-input button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.error-banner {
+  margin-top: 1rem;
+  border: 1px solid rgba(160, 45, 45, 0.22);
+  background: #fff3f0;
+  color: #8b1e1e;
+  padding: 0.9rem 1rem;
+  border-radius: 14px;
+}
+
+.response-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.response-card {
+  background: rgba(255, 255, 255, 0.96);
+  border: 1px solid rgba(29, 36, 51, 0.12);
+  border-radius: 20px;
+  padding: 1.1rem;
+  min-height: 260px;
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: baseline;
+}
+
+.label {
+  font-weight: 700;
+}
+
+.technique {
+  color: #5d6a7e;
+  text-transform: capitalize;
+}
+
+.response-text {
+  margin-top: 1rem;
+  white-space: pre-wrap;
+  color: #263046;
+}
+
+.rating-controls {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.rating-button {
+  width: 2.3rem;
+  height: 2.3rem;
+  border-radius: 999px;
+  border: 1px solid rgba(29, 36, 51, 0.18);
+  background: #fff;
+  cursor: pointer;
+}
+
+.rating-button.is-selected {
+  background: #333;
+  color: #fff;
+}
+
+@media (max-width: 960px) {
+  .app-shell {
+    grid-template-columns: 1fr;
+  }
+
+  .history-panel {
+    border-right: 0;
+    border-bottom: 1px solid rgba(29, 36, 51, 0.12);
+  }
+
+  .response-grid {
+    grid-template-columns: 1fr;
+  }
+}
