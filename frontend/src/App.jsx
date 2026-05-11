@@ -43,7 +43,7 @@ export default function App() {
   useEffect(() => {
     getHistory()
       .then((data) => setHistory(data.sessions))
-      .catch((err) => setError(err.message))
+      .catch(() => {/* history is non-critical — fail silently on startup */})
   }, [])
 
   async function handleSave(nextRatings = ratings) {

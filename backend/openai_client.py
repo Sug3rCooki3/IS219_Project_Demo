@@ -11,7 +11,7 @@ class OpenAIClientError(Exception):
     pass
 
 
-async def get_completion(prompt: str, max_tokens: int = 300) -> tuple[str, int]:
+async def get_completion(prompt: str, max_tokens: int = 1500) -> tuple[str, int]:
     api_key = os.getenv("OPENAI_API_KEY")
     if not api_key:
         raise OpenAIClientError("Missing OPENAI_API_KEY")
@@ -33,7 +33,7 @@ async def get_completion(prompt: str, max_tokens: int = 300) -> tuple[str, int]:
     return text, total_tokens
 
 
-async def get_completion_stream(prompt: str, max_tokens: int = 300):
+async def get_completion_stream(prompt: str, max_tokens: int = 1500):
     """Async generator that yields text chunks from OpenAI streaming."""
     api_key = os.getenv("OPENAI_API_KEY")
     if not api_key:

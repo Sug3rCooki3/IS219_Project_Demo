@@ -4,6 +4,8 @@ backend/.env
 
 # Database
 data/app.db
+data/*.db-shm
+data/*.db-wal
 
 # Python
 __pycache__/
@@ -15,12 +17,16 @@ __pycache__/
 *.egg-info/
 dist/
 build/
+.coverage
+htmlcov/
+coverage.xml
 
 # Frontend
 frontend/node_modules/
 frontend/dist/
 frontend/.env
 frontend/.env.local
+frontend/.env.*.local
 
 # OS
 .DS_Store
@@ -31,3 +37,7 @@ Thumbs.db
 .idea/
 *.swp
 *.swo
+
+# Logs
+*.log
+npm-debug.log*
