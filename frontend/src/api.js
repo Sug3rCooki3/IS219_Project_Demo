@@ -38,3 +38,17 @@ export async function getHistory() {
   const res = await fetch(`${BASE}/history`)
   return handleJsonResponse(res)
 }
+
+export async function autoScore(label, responseText) {
+  const res = await fetch(`${BASE}/auto-score`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ label, response_text: responseText }),
+  })
+  return handleJsonResponse(res)
+}
+
+export async function exportBest(sessionId) {
+  const res = await fetch(`${BASE}/export-best?session_id=${sessionId}`)
+  return handleJsonResponse(res)
+}

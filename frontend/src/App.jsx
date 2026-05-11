@@ -1,16 +1,18 @@
 import { useEffect, useState } from 'react'
 
-import { generateVariations, getHistory, getResponses, saveResults } from './api'
+import { autoScore, generateVariations, getHistory, getResponses, saveResults } from './api'
+import ExportButton from './components/ExportButton'
 import HistoryPanel from './components/HistoryPanel'
 import PromptInput from './components/PromptInput'
 import ResponseGrid from './components/ResponseGrid'
 
-function buildSessionPayload(basePrompt, tokenUsage, variations, responses, ratings) {
+function buildSessionPayload(basePrompt, tokenUsage, variations, responses, ratings, autoScores) {
   return {
     base_prompt: basePrompt,
     token_usage: tokenUsage,
     variations: variations.map((variation) => {
       const matchingResponse = responses.find((response) => response.label === variation.label)
+      const score = autoScores[variation.label]
       return {
         label: variation.label,
         technique: variation.technique,
@@ -18,9 +20,9 @@ function buildSessionPayload(basePrompt, tokenUsage, variations, responses, rati
         response_text: matchingResponse?.response ?? '',
         response_cached: matchingResponse?.cached ?? false,
         manual_score: ratings[variation.label] ?? null,
-        auto_clarity: null,
-        auto_relevance: null,
-        auto_completeness: null,
+        auto_clarity: score?.clarity ?? null,
+        auto_relevance: score?.relevance ?? null,
+        auto_completeness: score?.completeness ?? null,
       }
     }),
   }
@@ -32,7 +34,7 @@ export default function App() {
   const [responses, setResponses] = useState([])
   const [tokenUsage, setTokenUsage] = useState(null)
   const [ratings, setRatings] = useState({})
-  const [autoScores] = useState({})
+  const [autoScores, setAutoScores] = useState({})
   const [history, setHistory] = useState([])
   const [currentSessionId, setCurrentSessionId] = useState(null)
   const [loading, setLoading] = useState(false)
@@ -45,7 +47,7 @@ export default function App() {
   }, [])
 
   async function handleSave(nextRatings = ratings) {
-    const sessionData = buildSessionPayload(basePrompt, tokenUsage, variations, responses, nextRatings)
+    const sessionData = buildSessionPayload(basePrompt, tokenUsage, variations, responses, nextRatings, autoScores)
     const data = await saveResults(sessionData)
     setCurrentSessionId(data.session_id)
     const historyData = await getHistory()
@@ -56,6 +58,7 @@ export default function App() {
     setLoading(true)
     setError(null)
     setCurrentSessionId(null)
+    setAutoScores({})
     try {
       setBasePrompt(prompt)
       const variationData = await generateVariations(prompt)
@@ -65,12 +68,27 @@ export default function App() {
       const responseData = await getResponses(variationData.variations)
       setResponses(responseData.responses)
       setTokenUsage(responseData.token_usage)
+
+      // Phase 1: auto-score each response (non-fatal if it fails)
+      try {
+        const scores = {}
+        await Promise.all(
+          responseData.responses.map(async (r) => {
+            const score = await autoScore(r.label, r.response)
+            scores[r.label] = score
+          })
+        )
+        setAutoScores(scores)
+      } catch {
+        // auto-score failure is non-fatal — scores stay empty
+      }
     } catch (err) {
       setError(err.message)
       setVariations([])
       setResponses([])
       setTokenUsage(null)
       setRatings({})
+      setAutoScores({})
     } finally {
       setLoading(false)
     }
@@ -116,6 +134,16 @@ export default function App() {
     setVariations(sessionVariations)
     setResponses(sessionResponses)
     setRatings(sessionRatings)
+    setAutoScores(
+      Object.fromEntries(
+        session.variations
+          .filter((v) => v.auto_clarity != null)
+          .map((v) => [
+            v.label,
+            { clarity: v.auto_clarity, relevance: v.auto_relevance, completeness: v.auto_completeness },
+          ])
+      )
+    )
     setError(null)
   }
 
@@ -140,6 +168,7 @@ export default function App() {
           autoScores={autoScores}
           onRatingChange={handleRatingChange}
         />
+        <ExportButton sessionId={currentSessionId} onExport={() => {}} />
       </main>
     </div>
   )

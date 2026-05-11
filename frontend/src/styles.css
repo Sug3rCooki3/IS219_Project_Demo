@@ -177,7 +177,6 @@ textarea {
 
 .response-text {
   margin-top: 1rem;
-  white-space: pre-wrap;
   color: #263046;
 }
 
@@ -214,4 +213,55 @@ textarea {
   .response-grid {
     grid-template-columns: 1fr;
   }
+}
+
+.cached-badge {
+  font-size: 0.75rem;
+  background: #d4edda;
+  color: #155724;
+  border-radius: 999px;
+  padding: 0.1rem 0.6rem;
+}
+
+.score-display {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+  font-size: 0.82rem;
+  color: #4f5b70;
+}
+
+.score-unavailable {
+  color: #8e4b2f;
+  font-style: italic;
+}
+
+.score-avg {
+  font-weight: 700;
+  color: #1d2433;
+}
+
+.export-button {
+  margin-top: 1.5rem;
+}
+
+.export-button button {
+  border: 0;
+  border-radius: 999px;
+  background: #1d2433;
+  color: #fff;
+  padding: 0.85rem 1.3rem;
+  cursor: pointer;
+}
+
+.export-button button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.export-result {
+  margin-top: 0.75rem;
+  color: #1d2433;
+  font-weight: 500;
 }
