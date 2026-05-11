@@ -11,7 +11,7 @@ class OpenAIClientError(Exception):
     pass
 
 
-async def get_completion(prompt: str) -> tuple[str, int]:
+async def get_completion(prompt: str, max_tokens: int = 300) -> tuple[str, int]:
     api_key = os.getenv("OPENAI_API_KEY")
     if not api_key:
         raise OpenAIClientError("Missing OPENAI_API_KEY")
@@ -22,7 +22,7 @@ async def get_completion(prompt: str) -> tuple[str, int]:
         response = await client.responses.create(
             model="gpt-4.1-mini",
             input=prompt,
-            max_output_tokens=300,
+            max_output_tokens=max_tokens,
         )
     except Exception as exc:
         raise OpenAIClientError(str(exc)) from exc

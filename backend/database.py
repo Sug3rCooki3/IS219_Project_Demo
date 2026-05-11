@@ -42,6 +42,17 @@ def init_db():
             )
             """
         )
+        conn.execute(
+            """
+            CREATE TABLE IF NOT EXISTS prompt_cache (
+                prompt_hash     TEXT NOT NULL,
+                variation_label TEXT NOT NULL CHECK(variation_label IN ('A', 'B', 'C', 'D')),
+                response_text   TEXT NOT NULL,
+                created_at      TEXT NOT NULL,
+                PRIMARY KEY (prompt_hash, variation_label)
+            )
+            """
+        )
         conn.commit()
     finally:
         conn.close()
@@ -146,5 +157,75 @@ def get_all_sessions() -> list[dict]:
                 }
             )
         return sessions
+    finally:
+        conn.close()
+
+
+def get_session_by_id(session_id: int) -> dict | None:
+    conn = get_connection()
+    try:
+        row = conn.execute(
+            "SELECT id, created_at, base_prompt, token_usage FROM sessions WHERE id = ?",
+            (session_id,),
+        ).fetchone()
+        if row is None:
+            return None
+        variation_rows = conn.execute(
+            """
+            SELECT label, technique, variation_text, response_text, response_cached,
+                   manual_score, auto_clarity, auto_relevance, auto_completeness
+            FROM variations
+            WHERE session_id = ?
+            ORDER BY label ASC
+            """,
+            (session_id,),
+        ).fetchall()
+        return {
+            "id": row["id"],
+            "created_at": row["created_at"],
+            "base_prompt": row["base_prompt"],
+            "token_usage": row["token_usage"],
+            "variations": [
+                {
+                    "label": v["label"],
+                    "technique": v["technique"],
+                    "variation_text": v["variation_text"],
+                    "response_text": v["response_text"],
+                    "response_cached": bool(v["response_cached"]),
+                    "manual_score": v["manual_score"],
+                    "auto_clarity": v["auto_clarity"],
+                    "auto_relevance": v["auto_relevance"],
+                    "auto_completeness": v["auto_completeness"],
+                }
+                for v in variation_rows
+            ],
+        }
+    finally:
+        conn.close()
+
+
+def get_cached_response(prompt_hash: str, label: str) -> str | None:
+    conn = get_connection()
+    try:
+        row = conn.execute(
+            "SELECT response_text FROM prompt_cache WHERE prompt_hash = ? AND variation_label = ?",
+            (prompt_hash, label),
+        ).fetchone()
+        return row["response_text"] if row else None
+    finally:
+        conn.close()
+
+
+def save_cached_response(prompt_hash: str, label: str, response_text: str) -> None:
+    conn = get_connection()
+    try:
+        conn.execute(
+            """
+            INSERT OR REPLACE INTO prompt_cache (prompt_hash, variation_label, response_text, created_at)
+            VALUES (?, ?, ?, ?)
+            """,
+            (prompt_hash, label, response_text, _utc_timestamp()),
+        )
+        conn.commit()
     finally:
         conn.close()

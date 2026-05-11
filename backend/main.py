@@ -8,6 +8,8 @@ from routers.generate import router as generate_router
 from routers.history import router as history_router
 from routers.responses import router as responses_router
 from routers.results import router as results_router
+from routers.scoring import router as scoring_router
+from routers.export import router as export_router
 
 
 @asynccontextmanager
@@ -29,3 +31,5 @@ app.include_router(generate_router)
 app.include_router(responses_router)
 app.include_router(results_router)
 app.include_router(history_router)
+app.include_router(scoring_router)
+app.include_router(export_router)

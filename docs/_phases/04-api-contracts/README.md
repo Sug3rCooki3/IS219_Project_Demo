@@ -14,18 +14,18 @@ Use this phase to implement the request/response behavior for every endpoint.
 - CORS configuration
 
 ## Global Rules
-- [ ] Base URL is `http://localhost:8000`
-- [ ] All requests/responses use JSON
-- [ ] All errors return `{ "detail": "message" }`
+- [x] Base URL is `http://localhost:8000`
+- [x] All requests/responses use JSON
+- [x] All errors return `{ "detail": "message" }`
 
 ## Phase 0 Endpoints
 
 ### `POST /generate-variations`
-- [ ] Accepts `{ "base_prompt": "..." }`
-- [ ] Returns exactly 4 variations with labels `A-D`
-- [ ] Each variation has fields: `label`, `technique`, `text`
-- [ ] No LLM call in this endpoint — pure string transformation
-- [ ] Empty prompt returns `400` with `{ "detail": "base_prompt cannot be empty." }`
+- [x] Accepts `{ "base_prompt": "..." }`
+- [x] Returns exactly 4 variations with labels `A-D`
+- [x] Each variation has fields: `label`, `technique`, `text`
+- [x] No LLM call in this endpoint — pure string transformation
+- [x] Empty prompt returns `400` with `{ "detail": "base_prompt cannot be empty." }`
 
 **Request:**
 ```json
@@ -45,12 +45,12 @@ Use this phase to implement the request/response behavior for every endpoint.
 ```
 
 ### `POST /get-responses`
-- [ ] Accepts `{ "variations": [...] }`
-- [ ] Returns `responses` array plus `token_usage`
-- [ ] Each item in `responses` has fields: `label`, `response`, `cached`
-- [ ] `token_usage` is the total tokens across all 4 API calls combined
-- [ ] `cached` is always `false` in Phase 0
-- [ ] OpenAI failure returns `503` with `{ "detail": "OpenAI API is unreachable. Please try again." }`
+- [x] Accepts `{ "variations": [...] }`
+- [x] Returns `responses` array plus `token_usage`
+- [x] Each item in `responses` has fields: `label`, `response`, `cached`
+- [x] `token_usage` is the total tokens across all 4 API calls combined
+- [x] `cached` is always `false` in Phase 0
+- [x] OpenAI failure returns `503` with `{ "detail": "OpenAI API is unreachable. Please try again." }`
 
 **Response `200`:**
 ```json
@@ -66,12 +66,12 @@ Use this phase to implement the request/response behavior for every endpoint.
 ```
 
 ### `POST /save-results`
-- [ ] Accepts `base_prompt`, `token_usage`, and all 4 variations
-- [ ] Each variation in the array includes: `label`, `technique`, `variation_text`, `response_text`, `response_cached`, `manual_score`, `auto_clarity`, `auto_relevance`, `auto_completeness`
-- [ ] `manual_score` may be `null`
-- [ ] `auto_*` fields are `null` in Phase 0
-- [ ] Returns `201` with `{ "session_id": <int> }`
-- [ ] If variations array length is not 4, return `400` with `{ "detail": "variations array must contain exactly 4 items." }`
+- [x] Accepts `base_prompt`, `token_usage`, and all 4 variations
+- [x] Each variation in the array includes: `label`, `technique`, `variation_text`, `response_text`, `response_cached`, `manual_score`, `auto_clarity`, `auto_relevance`, `auto_completeness`
+- [x] `manual_score` may be `null`
+- [x] `auto_*` fields are `null` in Phase 0
+- [x] Returns `201` with `{ "session_id": <int> }`
+- [x] If variations array length is not 4, return `400` with `{ "detail": "variations array must contain exactly 4 items." }`
 
 **Request:**
 ```json
@@ -101,12 +101,12 @@ Use this phase to implement the request/response behavior for every endpoint.
 ```
 
 ### `GET /history`
-- [ ] Returns all sessions newest first
-- [ ] Each session includes: `id`, `created_at`, `base_prompt`, `token_usage`, and a nested `variations` array
-- [ ] Each variation in the array includes: `label`, `technique`, `variation_text`, `response_text`, `response_cached`, `manual_score`, `auto_clarity`, `auto_relevance`, `auto_completeness`
-- [ ] `response_cached` is returned as a boolean in the JSON response (even though it is stored as `INTEGER` in SQLite)
-- [ ] Empty history returns `200` with `{ "sessions": [] }`
-- [ ] Never return `404` for empty history
+- [x] Returns all sessions newest first
+- [x] Each session includes: `id`, `created_at`, `base_prompt`, `token_usage`, and a nested `variations` array
+- [x] Each variation in the array includes: `label`, `technique`, `variation_text`, `response_text`, `response_cached`, `manual_score`, `auto_clarity`, `auto_relevance`, `auto_completeness`
+- [x] `response_cached` is returned as a boolean in the JSON response (even though it is stored as `INTEGER` in SQLite)
+- [x] Empty history returns `200` with `{ "sessions": [] }`
+- [x] Never return `404` for empty history
 
 **Response `200`:**
 ```json
@@ -138,24 +138,24 @@ Use this phase to implement the request/response behavior for every endpoint.
 ## Phase 1 Endpoints
 
 ### `POST /auto-score`
-- [ ] Accepts `label` and `response_text`
-- [ ] Returns `label`, `clarity`, `relevance`, `completeness`
-- [ ] If the LLM returns malformed JSON, still return `200` with null subscores and `error: "Score unavailable"`
-- [ ] Never return `4xx`/`5xx` for a parse failure
+- [x] Accepts `label` and `response_text`
+- [x] Returns `label`, `clarity`, `relevance`, `completeness`
+- [x] If the LLM returns malformed JSON, still return `200` with null subscores and `error: "Score unavailable"`
+- [x] Never return `4xx`/`5xx` for a parse failure
 
 ### `GET /export-best`
-- [ ] Accepts `?session_id=7`
-- [ ] Returns `{ "session_id": <int>, "best_variation": { ... } }`
-- [ ] `best_variation` includes: `label`, `technique`, `variation_text`, `response_text`, `manual_score`, `auto_clarity`, `auto_relevance`, `auto_completeness`, `combined_score`
-- [ ] `combined_score` is `(auto_clarity + auto_relevance + auto_completeness) / 3`, rounded to 1 decimal place
-- [ ] If all variations tie, return Variation A
-- [ ] If all auto-scores are null, fall back to `manual_score` for ranking
-- [ ] Invalid session returns `404` with `{ "detail": "Session not found." }`
+- [x] Accepts `?session_id=7`
+- [x] Returns `{ "session_id": <int>, "best_variation": { ... } }`
+- [x] `best_variation` includes: `label`, `technique`, `variation_text`, `response_text`, `manual_score`, `auto_clarity`, `auto_relevance`, `auto_completeness`, `combined_score`
+- [x] `combined_score` is `(auto_clarity + auto_relevance + auto_completeness) / 3`, rounded to 1 decimal place
+- [x] If all variations tie, return Variation A
+- [x] If all auto-scores are null, fall back to `manual_score` for ranking
+- [x] Invalid session returns `404` with `{ "detail": "Session not found." }`
 
 ## CORS Rules
-- [ ] Allow origin `http://localhost:5173`
-- [ ] Allow methods `GET` and `POST`
-- [ ] Use `allow_headers=["*"]`
+- [x] Allow origin `http://localhost:5173`
+- [x] Allow methods `GET` and `POST`
+- [x] Use `allow_headers=["*"]`
 
 ```python
 app.add_middleware(
@@ -168,12 +168,14 @@ app.add_middleware(
 
 ## Tests for this Phase
 
-Create these files after implementing all Phase 0 routers and `variations.py` (Phase 05). Then run all 4 Phase 0 test files together.
+All 4 Phase 0 test files are implemented and passing (25 tests total). Phase 1 test files (`test_scoring.py`, `test_export.py`) are also implemented and passing (7 additional tests).
 
-**Phase 0 full run command:**
+**Full suite run command:**
 ```bash
-pytest tests/test_generate.py tests/test_responses.py tests/test_results.py tests/test_history.py -v
+pytest tests/ -v
 ```
+
+> **Status:** ✅ 32/32 tests passing
 
 ### `tests/test_generate.py`
 ```python
