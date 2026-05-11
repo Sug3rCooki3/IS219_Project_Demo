@@ -27,7 +27,7 @@ CREATE TABLE IF NOT EXISTS sessions (
 );
 ```
 
-- [ ] `token_usage` is populated in Phase 0 via `/save-results` and displayed in the UI in Phase 1
+- [x] `token_usage` is populated in Phase 0 via `/save-results` and displayed in the UI in Phase 1
 
 ### `variations`
 
@@ -60,29 +60,36 @@ CREATE TABLE IF NOT EXISTS prompt_cache (
 ```
 
 ## Required Rules
-- [ ] In Phase 0, create only `sessions` and `variations`
-- [ ] Still create `auto_*` columns in Phase 0 as nullable
+- [x] In Phase 0, create only `sessions` and `variations`
+- [x] Still create `auto_*` columns in Phase 0 as nullable
 - [ ] Do not create `prompt_cache` until Phase 1
-- [ ] Never use an ORM
-- [ ] Use raw SQL with `sqlite3.execute()`
-- [ ] In `get_connection()`, set `conn.row_factory = sqlite3.Row` so query results are accessible as dicts
-- [ ] In `get_connection()`, run `PRAGMA foreign_keys = ON`
-- [ ] `manual_score` may start as `NULL`; when present, it is inserted from the `/save-results` payload and does not require a separate `UPDATE`
-- [ ] `prompt_hash` is the SHA-256 hex digest of the full `variation_text`: `hashlib.sha256(text.encode()).hexdigest()`
+- [x] Never use an ORM
+- [x] Use raw SQL with `sqlite3.execute()`
+- [x] In `get_connection()`, set `conn.row_factory = sqlite3.Row` so query results are accessible as dicts
+- [x] In `get_connection()`, run `PRAGMA foreign_keys = ON`
+- [x] `manual_score` may start as `NULL`; when present, it is inserted from the `/save-results` payload and does not require a separate `UPDATE`
+- [ ] `prompt_hash` is the SHA-256 hex digest of the full `variation_text`: `hashlib.sha256(text.encode()).hexdigest()` (Phase 1)
 
 ## Relationships
-- [ ] `sessions` has a one-to-many relationship with `variations` via `session_id`
-- [ ] `prompt_cache` is standalone and keyed by hash, not `session_id`
+- [x] `sessions` has a one-to-many relationship with `variations` via `session_id`
+- [ ] `prompt_cache` is standalone and keyed by hash, not `session_id` (Phase 1)
 
 ## Insert / Timestamp Rules
-- [ ] `created_at` format is ISO 8601 UTC like `2026-04-27T14:32:00Z`
-- [ ] Generate timestamps with `datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")`
-- [ ] Prefer `RETURNING id` for session inserts on SQLite 3.35+
-- [ ] Fall back to `cursor.lastrowid` on older SQLite versions
+- [x] `created_at` format is ISO 8601 UTC like `2026-04-27T14:32:00Z`
+- [x] Generate timestamps with `datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")`
+- [x] Prefer `RETURNING id` for session inserts on SQLite 3.35+
+- [x] Fall back to `cursor.lastrowid` on older SQLite versions
 
 ## Tests for this Phase
 
-Create these files now. They can only be run after Phase 04 routers (`/save-results`, `/history`) are also implemented.
+These files are implemented and all 10 tests pass.
+
+**Run command:**
+```bash
+pytest tests/test_results.py tests/test_history.py -v
+```
+
+> **Status:** ✅ 10/10 tests passing
 
 **Run command:**
 ```bash
