@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 
-import { autoScore, generateVariations, getHistory, getResponses, saveResults } from './api'
+import { autoScore, generateVariations, getHistory, saveResults, streamResponse } from './api'
 import ExportButton from './components/ExportButton'
 import HistoryPanel from './components/HistoryPanel'
 import PromptInput from './components/PromptInput'
@@ -64,18 +64,38 @@ export default function App() {
       const variationData = await generateVariations(prompt)
       setVariations(variationData.variations)
       setRatings({})
+      setTokenUsage(null)
 
-      const responseData = await getResponses(variationData.variations)
-      setResponses(responseData.responses)
-      setTokenUsage(responseData.token_usage)
+      // Show cards immediately with empty text — they fill as chunks arrive
+      setResponses(variationData.variations.map((v) => ({ label: v.label, response: '', cached: false })))
 
-      // Phase 1: auto-score each response (non-fatal if it fails)
+      // Stream all 4 variations in parallel; accumulate full text locally for auto-scoring
+      const streamResults = await Promise.all(
+        variationData.variations.map(async (v) => {
+          let fullText = ''
+          await streamResponse(
+            v.label,
+            v.text,
+            (chunk) => {
+              fullText += chunk
+              setResponses((prev) =>
+                prev.map((r) => (r.label === v.label ? { ...r, response: r.response + chunk } : r))
+              )
+            },
+            () => {},
+            () => {},
+          )
+          return { label: v.label, fullText }
+        })
+      )
+
+      // Auto-score using the complete accumulated text (non-fatal)
       try {
         const scores = {}
         await Promise.all(
-          responseData.responses.map(async (r) => {
-            const score = await autoScore(r.label, r.response)
-            scores[r.label] = score
+          streamResults.map(async ({ label, fullText }) => {
+            const score = await autoScore(label, fullText)
+            scores[label] = score
           })
         )
         setAutoScores(scores)
